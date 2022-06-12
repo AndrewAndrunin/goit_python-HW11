@@ -14,7 +14,8 @@ class AddressBook(UserDict):
         for k, v in self.data.items():
             counter += 1
             print(v)
-        return f'List has {counter} profile(s)'
+        return f'Database has {counter} profile(s)'
+        
 
     def add_record(self, record):
         self.data[record.name.value] = record
@@ -23,9 +24,19 @@ class AddressBook(UserDict):
 
     def iterator(self, num):
         counter = 0
-        while counter < num:
-            print(self.listdata[counter])
-            counter += 1
+        start_counter = counter
+        while True:
+            temp_list = []
+            try:
+                while counter < start_counter + num:
+                    temp_list.append(self.listdata[counter])
+                    counter += 1
+            except IndexError:
+                yield temp_list
+                break
+            yield temp_list
+            start_counter = counter
+            temp_list.clear
 
 
 class Record:
@@ -86,6 +97,11 @@ class Record:
         else:
             return f'{self.name.value} phone(s) is {self.phones_show}, his/here birth date is {self.birthday}.'
             
+    def __repr__(self) -> str:
+        if self.birthday == None:
+            return f'{self.name.value}, {self.phones}'
+        else:
+            return f'{self.name.value}, {self.phones}, {self.birthday.value}'
 
 class Field:
     pass
@@ -259,8 +275,13 @@ def days_to_birthday(*args):
 
 @input_error   
 def show_num(*args):
-    phone_book.iterator(int(args[0]))
-    return f'{args[0]} profile(s) showed'
+    iter = phone_book.iterator(int(args[0]))
+    for i in iter:
+        print('--------------')
+        a = i
+        for i2 in a:
+            print(i2)
+    return f'{len(phone_book.listdata)} profile(s) showed'
 
 
 COMMANDS = {
